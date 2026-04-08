@@ -1,6 +1,6 @@
+import streamlit as st
 import pickle
 import re
-import nltk
 from nltk.corpus import stopwords
 
 stop_words = set(stopwords.words('english'))
@@ -12,19 +12,19 @@ def clean_text(text):
     text = text.lower()
     text = re.sub(r'\d+', '', text)
     text = re.sub(r'[^\w\s]', '', text)
-    
     words = text.split()
     words = [word for word in words if word not in stop_words]
-    
     return " ".join(words)
 
-def predict_spam(message):
-    message = clean_text(message)
-    vector = vectorizer.transform([message])
-    result = model.predict(vector)
-    
-    return "Spam" if result[0] == 1 else "Not Spam"
+def predict(message):
+    vector = vectorizer.transform([clean_text(message)])
+    result = model.predict(vector)[0]
+    return "Spam" if result == 1 else "Not Spam"
 
-if __name__ == "__main__":
-    msg = input("Enter message: ")
-    print("Prediction:", predict_spam(msg))
+st.title("📧 Email Spam Detector")
+
+message = st.text_area("Enter your message")
+
+if st.button("Check"):
+    if message:
+        st.write(predict(message))
